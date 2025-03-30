@@ -1,96 +1,118 @@
-<div class="container">
-  <h1>JSON to TypeScript Converter</h1>
+<div class="min-h-screen transition-colors duration-300 dark:bg-gray-900">
+  <div class="container mx-auto max-w-6xl p-5 font-sans text-gray-800 dark:text-gray-200">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">JSON to TypeScript Converter</h1>
+      <button (click)="toggleDarkMode()"
+        class="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+        aria-label="Toggle dark/light mode">
+        @if (darkMode()) {
+        <!-- Sun icon for light mode -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+        } @else {
+        <!-- Moon icon for dark mode -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-700" fill="none" viewBox="0 0 24 24"
+          stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+        }
+      </button>
+    </div>
 
-  <!-- Visitor count with new control flow syntax -->
-  <div class="visitor-counter">
-    @if (isVisitorCountLoading()) {
+    <!-- Visitor count with new control flow syntax -->
+    <div class="text-center mb-5 text-sm text-gray-500 dark:text-gray-400">
+      @if (isVisitorCountLoading()) {
       <span>Loading visitor count...</span>
-    } @else if (visitorCountError()) {
-      <span class="error">{{ visitorCountError() }}</span>
-    } @else {
+      } @else if (visitorCountError()) {
+      <span class="text-red-500 dark:text-red-400">{{ visitorCountError() }}</span>
+      } @else {
       <span><strong>{{ visitorCount() }}</strong> visitors have used this tool</span>
-    }
-  </div>
-
-  <div class="converter-area">
-    <div class="input-section">
-      <div class="section-header">
-        <h2>JSON Input</h2>
-        <div class="actions">
-          <button class="action-btn" (click)="clearInput()">Clear</button>
-          <button class="action-btn" (click)="loadSampleJson()">Sample</button>
-        </div>
-      </div>
-      <textarea 
-        [ngModel]="jsonInput()" 
-        (ngModelChange)="onJsonInputChange($event)" 
-        rows="15"
-        placeholder="Enter JSON here" 
-        [class.error]="inputHasError()"
-      ></textarea>
-      
-      @if (inputHasError()) {
-        <div class="error-message">{{ inputErrorMessage() }}</div>
       }
     </div>
 
-    <div class="buttons">
-      <button 
-        class="main-btn" 
-        (click)="convertJsonToTs()" 
-        [disabled]="!canConvert()"
-      >
-        Convert →
-      </button>
-      <div class="options">
-        <div class="checkbox-option">
-          <input 
-            type="checkbox" 
-            id="useInterfaces" 
-            [checked]="useInterfaces()" 
-            (change)="toggleUseInterfaces()"
-          >
-          <label for="useInterfaces">Use interfaces (vs types)</label>
+    <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-5 mt-5">
+      <div
+        class="flex flex-col border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-gray-800">
+        <div
+          class="flex justify-between items-center px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+          <h2 class="text-base font-medium text-gray-700 dark:text-gray-200">JSON Input</h2>
+          <div class="flex gap-2">
+            <button
+              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-xs font-medium rounded transition"
+              (click)="clearInput()">Clear</button>
+            <button
+              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-xs font-medium rounded transition"
+              (click)="loadSampleJson()">Sample</button>
+          </div>
         </div>
-        <div class="checkbox-option">
-          <input 
-            type="checkbox" 
-            id="useOptionalFields" 
-            [checked]="useOptionalFields()"
-            (change)="toggleUseOptionalFields()"
-          >
-          <label for="useOptionalFields">Mark fields as optional</label>
+        <textarea [ngModel]="jsonInput()" (ngModelChange)="onJsonInputChange($event)" rows="15"
+          placeholder="Enter JSON here"
+          class="flex-1 p-4 border-none font-mono text-sm leading-relaxed outline-none resize-none bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+          [class.bg-red-50]="inputHasError()" [class.dark:bg-red-900]="inputHasError()"
+          [class.border-red-500]="inputHasError()"></textarea>
+
+        @if (inputHasError()) {
+        <div
+          class="px-4 py-2.5 text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 border-t border-red-200 dark:border-red-800 text-sm">
+          {{ inputErrorMessage() }}</div>
+        }
+      </div>
+
+      <div class="flex md:flex-col items-center justify-center gap-5 py-2.5">
+        <button
+          class="px-5 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded shadow transition hover:-translate-y-0.5 hover:shadow-md disabled:opacity-50 disabled:pointer-events-none"
+          (click)="convertJsonToTs()" [disabled]="!canConvert()">
+          Convert →
+        </button>
+        <div
+          class="flex flex-col gap-2.5 p-2.5 border border-gray-200 dark:border-gray-700 rounded-md bg-gray-50 dark:bg-gray-700">
+          <div class="flex items-center gap-2 text-sm">
+            <input type="checkbox" id="useInterfaces" [checked]="useInterfaces()" (change)="toggleUseInterfaces()"
+              class="rounded text-blue-500 dark:bg-gray-600">
+            <label for="useInterfaces" class="dark:text-gray-200">Use interfaces (vs types)</label>
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <input type="checkbox" id="useOptionalFields" [checked]="useOptionalFields()"
+              (change)="toggleUseOptionalFields()" class="rounded text-blue-500 dark:bg-gray-600">
+            <label for="useOptionalFields" class="dark:text-gray-200">Mark fields as optional</label>
+          </div>
         </div>
+      </div>
+
+      <div
+        class="flex flex-col border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm bg-white dark:bg-gray-800">
+        <div
+          class="flex justify-between items-center px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600">
+          <h2 class="text-base font-medium text-gray-700 dark:text-gray-200">TypeScript Output</h2>
+          <div class="flex gap-2">
+            <button
+              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-xs font-medium rounded transition disabled:opacity-50 disabled:pointer-events-none"
+              (click)="copyToClipboard()" [disabled]="!canCopyOrDownload()">
+              Copy
+            </button>
+            <button
+              class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-xs font-medium rounded transition disabled:opacity-50 disabled:pointer-events-none"
+              (click)="downloadAsFile()" [disabled]="!canCopyOrDownload()">
+              Download
+            </button>
+          </div>
+        </div>
+        <pre
+          class="flex-1 p-4 m-0 overflow-auto bg-gray-50 dark:bg-gray-800 font-mono text-sm leading-relaxed whitespace-pre-wrap break-words text-gray-800 dark:text-gray-200"
+          [class.text-gray-500]="!tsOutput()" [class.dark:text-gray-400]="!tsOutput()"
+          [class.italic]="!tsOutput()">{{ tsOutput() || 'TypeScript output will appear here' }}</pre>
       </div>
     </div>
 
-    <div class="output-section">
-      <div class="section-header">
-        <h2>TypeScript Output</h2>
-        <div class="actions">
-          <button 
-            class="action-btn" 
-            (click)="copyToClipboard()" 
-            [disabled]="!canCopyOrDownload()"
-          >
-            Copy
-          </button>
-          <button 
-            class="action-btn" 
-            (click)="downloadAsFile()" 
-            [disabled]="!canCopyOrDownload()"
-          >
-            Download
-          </button>
-        </div>
-      </div>
-      <pre [class.empty]="!tsOutput()">
-        {{ tsOutput() || 'TypeScript output will appear here' }}
-      </pre>
+    @if (copySuccess()) {
+    <div
+      class="fixed bottom-5 right-5 px-5 py-2.5 rounded text-sm shadow-lg bg-green-500 dark:bg-green-600 text-white z-50 animate-fade">
+      Copied to clipboard!
     </div>
+    }
   </div>
-
-  @if (copySuccess()) {
-    <div class="toast success">Copied to clipboard!</div>
-  }
 </div>

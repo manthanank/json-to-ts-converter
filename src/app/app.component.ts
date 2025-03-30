@@ -1,4 +1,11 @@
-import { Component, signal, computed, effect, inject } from '@angular/core';
+import {
+  Component,
+  signal,
+  computed,
+  effect,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TrackService } from './services/track.service';
 import { Visit } from './models/visit.model';
@@ -9,7 +16,7 @@ import { Visit } from './models/visit.model';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'json-to-ts-converter';
 
   // State signals
@@ -20,6 +27,7 @@ export class AppComponent {
   copySuccess = signal<boolean>(false);
   useInterfaces = signal<boolean>(true);
   useOptionalFields = signal<boolean>(false);
+  darkMode = signal<boolean>(false);
 
   private trackService = inject(TrackService);
 
@@ -43,26 +51,41 @@ export class AppComponent {
       const input = this.jsonInput();
       this.validateJsonInput();
     });
+
+    // Apply dark mode changes
+    effect(() => {
+      if (this.darkMode()) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    });
   }
 
   ngOnInit(): void {
     this.trackVisit();
+    this.initializeDarkMode();
   }
 
-  private trackVisit(): void {
-    this.isVisitorCountLoading.set(true);
-    this.visitorCountError.set(null);
+  private initializeDarkMode(): void {
+    // Check for user preference in localStorage
+    const savedMode = localStorage.getItem('darkMode');
+    if (savedMode) {
+      this.darkMode.set(savedMode === 'true');
+    } else {
+      // Check for system preference
+      const prefersDark = window.matchMedia(
+        '(prefers-color-scheme: dark)'
+      ).matches;
+      this.darkMode.set(prefersDark);
+    }
+  }
 
-    this.trackService.trackProjectVisit(this.title).subscribe({
-      next: (response: Visit) => {
-        this.visitorCount.set(response.uniqueVisitors);
-        this.isVisitorCountLoading.set(false);
-      },
-      error: (err: Error) => {
-        console.error('Failed to track visit:', err);
-        this.visitorCountError.set('Failed to load visitor count');
-        this.isVisitorCountLoading.set(false);
-      },
+  toggleDarkMode(): void {
+    this.darkMode.update((current) => {
+      const newValue = !current;
+      localStorage.setItem('darkMode', newValue.toString());
+      return newValue;
     });
   }
 
@@ -171,6 +194,23 @@ export class AppComponent {
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
+  }
+
+  private trackVisit(): void {
+    this.isVisitorCountLoading.set(true);
+    this.visitorCountError.set(null);
+
+    this.trackService.trackProjectVisit(this.title).subscribe({
+      next: (response: Visit) => {
+        this.visitorCount.set(response.uniqueVisitors);
+        this.isVisitorCountLoading.set(false);
+      },
+      error: (err: Error) => {
+        console.error('Failed to track visit:', err);
+        this.visitorCountError.set('Failed to load visitor count');
+        this.isVisitorCountLoading.set(false);
+      },
+    });
   }
 
   private generateInterface(interfaceName: string, obj: any): string {
